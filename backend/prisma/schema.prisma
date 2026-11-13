@@ -1,0 +1,303 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Role {
+  id         String   @id @default(uuid()) @db.Uuid
+  code       String   @unique
+  name       String
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  users      User[]
+
+  @@map("roles")
+}
+
+model User {
+  id            String             @id @default(uuid()) @db.Uuid
+  email         String             @unique
+  full_name     String
+  password_hash String
+  role_id       String             @db.Uuid
+  role          Role               @relation(fields: [role_id], references: [id], onDelete: Restrict)
+  created_date  DateTime           @default(now()) @db.Timestamptz(6)
+  products      Product[]
+  categories    Category[]
+  customers     Customer[]
+  suppliers     Supplier[]
+  expenses      Expense[]
+  sales         Sale[]
+  payments      Payment[]
+  movements     StockMovement[]
+  settings      AppSettings?
+  purchases     SupplierPurchase[]
+  ai_conversations AiConversation[]
+
+  @@map("users")
+}
+
+model Product {
+  id                String                 @id @default(uuid()) @db.Uuid
+  owner_id          String                 @db.Uuid
+  owner             User                   @relation(fields: [owner_id], references: [id], onDelete: Cascade)
+  category_id       String?                @db.Uuid
+  category_record   Category?              @relation(fields: [category_id], references: [id], onDelete: SetNull)
+  name              String
+  brand             String                 @default("")
+  sku               String?
+  barcode           String                 @default("")
+  category          String                 @default("")
+  unit              String                 @default("pcs")
+  cost_price        Decimal                @default(0) @db.Decimal(12, 2)
+  selling_price     Decimal                @db.Decimal(12, 2)
+  stock_quantity    Decimal                @default(0) @db.Decimal(12, 2)
+  reorder_threshold Decimal                @default(5) @db.Decimal(12, 2)
+  description       String                 @default("")
+  image_url         String                 @default("")
+  image_metadata    Json?
+  is_archived       Boolean                @default(false)
+  created_date      DateTime               @default(now()) @db.Timestamptz(6)
+  movements         StockMovement[]
+  sale_items        SaleItem[]
+  purchase_items    SupplierPurchaseItem[]
+
+  @@index([owner_id, name])
+  @@index([owner_id, category])
+  @@index([owner_id, stock_quantity])
+  @@unique([owner_id, sku])
+  @@map("products")
+}
+
+model Category {
+  id           String    @id @default(uuid()) @db.Uuid
+  owner_id     String    @db.Uuid
+  owner        User      @relation(fields: [owner_id], references: [id], onDelete: Cascade)
+  name         String
+  description  String    @default("")
+  color        String    @default("blue")
+  is_active    Boolean   @default(true)
+  created_date DateTime  @default(now()) @db.Timestamptz(6)
+  products     Product[]
+
+  @@unique([owner_id, name])
+  @@map("categories")
+}
+
+model Customer {
+  id             String   @id @default(uuid()) @db.Uuid
+  owner_id       String   @db.Uuid
+  owner          User     @relation(fields: [owner_id], references: [id], onDelete: Cascade)
+  name           String
+  contact_person String   @default("")
+  phone          String   @default("")
+  email          String   @default("")
+  address        String   @default("")
+  notes          String   @default("")
+  created_date   DateTime @default(now()) @db.Timestamptz(6)
+  sales          Sale[]
+
+  @@index([owner_id, name])
+  @@map("customers")
+}
+
+model Supplier {
+  id             String             @id @default(uuid()) @db.Uuid
+  owner_id       String             @db.Uuid
+  owner          User               @relation(fields: [owner_id], references: [id], onDelete: Cascade)
+  name           String
+  contact_person String             @default("")
+  phone          String             @default("")
+  email          String             @default("")
+  address        String             @default("")
+  notes          String             @default("")
+  created_date   DateTime           @default(now()) @db.Timestamptz(6)
+  purchases      SupplierPurchase[]
+  movements      StockMovement[]
+
+  @@index([owner_id, name])
+  @@map("suppliers")
+}
+
+model Expense {
+  id             String   @id @default(uuid()) @db.Uuid
+  owner_id       String   @db.Uuid
+  owner          User     @relation(fields: [owner_id], references: [id], onDelete: Cascade)
+  title          String
+  category       String   @default("Other")
+  amount         Decimal  @db.Decimal(12, 2)
+  payment_method String   @default("cash")
+  expense_date   DateTime @default(now()) @db.Date
+  notes          String   @default("")
+  created_date   DateTime @default(now()) @db.Timestamptz(6)
+
+  @@index([owner_id, expense_date])
+  @@map("expenses")
+}
+
+model Sale {
+  id              String     @id @default(uuid()) @db.Uuid
+  owner_id        String     @db.Uuid
+  owner           User       @relation(fields: [owner_id], references: [id], onDelete: Cascade)
+  receipt_number  String
+  sale_date       DateTime   @default(now()) @db.Timestamptz(6)
+  item_count      Decimal    @default(0) @db.Decimal(12, 2)
+  subtotal        Decimal    @default(0) @db.Decimal(12, 2)
+  discount        Decimal    @default(0) @db.Decimal(12, 2)
+  tax             Decimal    @default(0) @db.Decimal(12, 2)
+  total           Decimal    @default(0) @db.Decimal(12, 2)
+  gross_profit    Decimal    @default(0) @db.Decimal(12, 2)
+  payment_method  String
+  amount_received Decimal    @default(0) @db.Decimal(12, 2)
+  change_due      Decimal    @default(0) @db.Decimal(12, 2)
+  customer_id     String?    @db.Uuid
+  customer        Customer?  @relation(fields: [customer_id], references: [id], onDelete: SetNull)
+  customer_name   String     @default("")
+  cashier_name    String     @default("")
+  status          String     @default("completed")
+  notes           String     @default("")
+  created_date    DateTime   @default(now()) @db.Timestamptz(6)
+  items           SaleItem[]
+  payments        Payment[]
+
+  @@unique([owner_id, receipt_number])
+  @@index([owner_id, sale_date(sort: Desc)])
+  @@map("sales")
+}
+
+model SaleItem {
+  id         String   @id @default(uuid()) @db.Uuid
+  sale_id    String   @db.Uuid
+  sale       Sale     @relation(fields: [sale_id], references: [id], onDelete: Cascade)
+  product_id String?  @db.Uuid
+  product    Product? @relation(fields: [product_id], references: [id], onDelete: SetNull)
+  name       String
+  sku        String   @default("")
+  unit       String   @default("pcs")
+  quantity   Decimal  @db.Decimal(12, 2)
+  unit_price Decimal  @db.Decimal(12, 2)
+  cost_price Decimal  @db.Decimal(12, 2)
+  line_total Decimal  @db.Decimal(12, 2)
+
+  @@index([sale_id])
+  @@index([product_id])
+  @@map("sale_items")
+}
+
+model Payment {
+  id             String   @id @default(uuid()) @db.Uuid
+  owner_id       String   @db.Uuid
+  owner          User     @relation(fields: [owner_id], references: [id], onDelete: Cascade)
+  sale_id        String   @db.Uuid
+  sale           Sale     @relation(fields: [sale_id], references: [id], onDelete: Cascade)
+  payment_method String
+  amount         Decimal  @db.Decimal(12, 2)
+  reference      String   @default("")
+  status         String   @default("recorded")
+  paid_at        DateTime @default(now()) @db.Timestamptz(6)
+
+  @@index([owner_id, paid_at])
+  @@index([sale_id])
+  @@map("payments")
+}
+
+model StockMovement {
+  id              String    @id @default(uuid()) @db.Uuid
+  owner_id        String    @db.Uuid
+  owner           User      @relation(fields: [owner_id], references: [id], onDelete: Cascade)
+  product_id      String    @db.Uuid
+  product         Product   @relation(fields: [product_id], references: [id], onDelete: Restrict)
+  supplier_id     String?   @db.Uuid
+  supplier        Supplier? @relation(fields: [supplier_id], references: [id], onDelete: SetNull)
+  product_name    String
+  sku             String    @default("")
+  type            String
+  quantity_change Decimal   @db.Decimal(12, 2)
+  quantity_before Decimal   @db.Decimal(12, 2)
+  quantity_after  Decimal   @db.Decimal(12, 2)
+  reason          String    @default("")
+  reference       String    @default("")
+  recorded_by     String    @default("")
+  created_date    DateTime  @default(now()) @db.Timestamptz(6)
+
+  @@index([owner_id, created_date(sort: Desc)])
+  @@index([product_id, created_date(sort: Desc)])
+  @@map("stock_movements")
+}
+
+model SupplierPurchase {
+  id           String                 @id @default(uuid()) @db.Uuid
+  owner_id     String                 @db.Uuid
+  owner        User                   @relation(fields: [owner_id], references: [id], onDelete: Cascade)
+  supplier_id  String                 @db.Uuid
+  supplier     Supplier               @relation(fields: [supplier_id], references: [id], onDelete: Restrict)
+  reference    String                 @default("")
+  total        Decimal                @default(0) @db.Decimal(12, 2)
+  purchased_at DateTime               @default(now()) @db.Timestamptz(6)
+  created_date DateTime               @default(now()) @db.Timestamptz(6)
+  items        SupplierPurchaseItem[]
+
+  @@index([owner_id, purchased_at(sort: Desc)])
+  @@map("supplier_purchases")
+}
+
+model SupplierPurchaseItem {
+  id          String           @id @default(uuid()) @db.Uuid
+  purchase_id String           @db.Uuid
+  purchase    SupplierPurchase @relation(fields: [purchase_id], references: [id], onDelete: Cascade)
+  product_id  String           @db.Uuid
+  product     Product          @relation(fields: [product_id], references: [id], onDelete: Restrict)
+  quantity    Decimal          @db.Decimal(12, 2)
+  unit_cost   Decimal          @db.Decimal(12, 2)
+  line_total  Decimal          @db.Decimal(12, 2)
+
+  @@index([purchase_id])
+  @@map("supplier_purchase_items")
+}
+
+model AppSettings {
+  id                  String   @id @default(uuid()) @db.Uuid
+  owner_id            String   @unique @db.Uuid
+  owner               User     @relation(fields: [owner_id], references: [id], onDelete: Cascade)
+  store_name          String   @default("RetailPro Store")
+  store_tagline       String   @default("Provisions & General Goods")
+  store_address       String   @default("")
+  store_phone         String   @default("")
+  tin                 String   @default("")
+  currency            String   @default("GHS")
+  tax_rate            Decimal  @default(0) @db.Decimal(6, 3)
+  receipt_footer      String   @default("Thank you for shopping with us.")
+  low_stock_threshold Decimal  @default(5) @db.Decimal(12, 2)
+  created_date        DateTime @default(now()) @db.Timestamptz(6)
+  updated_date        DateTime @default(now()) @updatedAt @db.Timestamptz(6)
+
+  @@map("app_settings")
+}
+
+model AiConversation {
+  id           String      @id @default(uuid()) @db.Uuid
+  owner_id     String      @db.Uuid
+  owner        User        @relation(fields: [owner_id], references: [id], onDelete: Cascade)
+  title        String      @default("New chat")
+  created_date DateTime    @default(now()) @db.Timestamptz(6)
+  updated_date DateTime    @default(now()) @updatedAt @db.Timestamptz(6)
+  messages     AiMessage[]
+
+  @@index([owner_id, updated_date(sort: Desc)])
+  @@map("ai_conversations")
+}
+
+model AiMessage {
+  id              String        @id @default(uuid()) @db.Uuid
+  conversation_id String        @db.Uuid
+  conversation    AiConversation @relation(fields: [conversation_id], references: [id], onDelete: Cascade)
+  role            String
+  content         String        @db.Text
+  status          String        @default("complete")
+  created_date    DateTime      @default(now()) @db.Timestamptz(6)
+
+  @@index([conversation_id, created_date])
+  @@map("ai_messages")
+}

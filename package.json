@@ -1,0 +1,17 @@
+{
+  "name": "retailpos",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "npm --prefix frontend run dev",
+    "build": "npm --prefix frontend run build",
+    "lint": "npm --prefix frontend run lint",
+    "preview": "npm --prefix frontend run preview",
+    "api": "npm --prefix backend start",
+    "api:dev": "npm --prefix backend run dev",
+    "db:migrate": "npm --prefix backend run prisma:migrate",
+    "db:deploy": "npm --prefix backend run prisma:deploy",
+    "db:seed": "npm --prefix backend run prisma:seed",
+    "test": "npm --prefix backend test"
+  }
+}

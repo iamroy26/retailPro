@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="240" viewBox="0 0 900 240" role="img" aria-labelledby="title desc">
+  <title id="title">RetailPro logo</title>
+  <desc id="desc">Emerald shopping cart and stylized R symbol beside the RetailPro wordmark.</desc>
+  <defs>
+    <linearGradient id="emerald" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#22B982"/>
+      <stop offset="100%" stop-color="#116B49"/>
+    </linearGradient>
+  </defs>
+  <!-- Symbol -->
+  <g transform="translate(24 24)" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M30 26 H91 C116 26 128 39 128 61 C128 78 119 89 101 98 L69 115 C56 122 52 133 57 145 C62 157 76 164 92 164 H120"
+          stroke="url(#emerald)" stroke-width="17"/>
+    <path d="M23 53 H43 L59 112 H119 L136 67 H52"
+          stroke="#171C19" stroke-width="8"/>
+    <path d="M66 85 H126 M72 105 L65 75 M95 75 L91 105 M116 75 L111 105"
+          stroke="#16865D" stroke-width="5"/>
+    <circle cx="76" cy="132" r="7" fill="#16865D" stroke="none"/>
+    <circle cx="116" cy="132" r="7" fill="#16865D" stroke="none"/>
+  </g>
+  <!-- Wordmark -->
+  <text x="205" y="132" font-family="Inter, Arial, Helvetica, sans-serif" font-size="88" font-weight="750" letter-spacing="-4" fill="#171C19">Retail<tspan fill="#16865D">Pro</tspan></text>
+  <text x="210" y="176" font-family="Inter, Arial, Helvetica, sans-serif" font-size="20" font-weight="500" letter-spacing="4" fill="#68736C">SMART POS. BETTER BUSINESS.</text>
+</svg>

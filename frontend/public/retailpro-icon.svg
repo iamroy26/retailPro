@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 180 180" role="img" aria-labelledby="title">
+  <title id="title">RetailPro icon</title>
+  <defs>
+    <linearGradient id="emerald" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#22B982"/>
+      <stop offset="100%" stop-color="#116B49"/>
+    </linearGradient>
+  </defs>
+  <rect x="5" y="5" width="170" height="170" rx="38" fill="#FFFFFF"/>
+  <path d="M43 31 H101 C124 31 137 44 137 65 C137 82 127 94 108 104 L79 119 C64 127 61 139 68 150"
+        fill="none" stroke="url(#emerald)" stroke-width="15" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M34 61 H51 L65 112 H121 L136 73 H56"
+        fill="none" stroke="#171C19" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M71 89 H126 M78 75 L83 109 M101 75 L101 109 M121 75 L116 109"
+        fill="none" stroke="#16865D" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="82" cy="132" r="6" fill="#16865D"/>
+  <circle cx="118" cy="132" r="6" fill="#16865D"/>
+</svg>
